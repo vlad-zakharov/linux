@@ -104,6 +104,8 @@ source "arch/arc/plat-eznps/Kconfig"
 
 endmenu
 
+source "drivers/cpufreq/Kconfig"
+
 choice
 	prompt "ARC Instruction Set"
 	default ISA_ARCOMPACT
