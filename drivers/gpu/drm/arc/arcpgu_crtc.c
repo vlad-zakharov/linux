@@ -129,18 +129,16 @@ static void arc_pgu_crtc_disable(struct drm_crtc *crtc)
 			      ~ARCPGU_CTRL_ENABLE_MASK);
 }
 
-static int arc_pgu_crtc_atomic_check(struct drm_crtc *crtc,
-				     struct drm_crtc_state *state)
+static bool arc_pgu_crtc_mode_fixup(struct drm_crtc *crtc,
+				    const struct drm_display_mode *mode,
+				    struct drm_display_mode *adjusted_mode)
 {
 	struct arcpgu_drm_private *arcpgu = crtc_to_arcpgu_priv(crtc);
-	struct drm_display_mode *mode = &state->adjusted_mode;
-	long rate, clk_rate = mode->clock * 1000;
 
-	rate = clk_round_rate(arcpgu->clk, clk_rate);
-	if (rate != clk_rate)
-		return -EINVAL;
+	adjusted_mode->clock =
+		clk_round_rate(arcpgu->clk, mode->clock * 1000) / 1000;
 
-	return 0;
+	return true;
 }
 
 static void arc_pgu_crtc_atomic_begin(struct drm_crtc *crtc,
@@ -165,8 +163,8 @@ static const struct drm_crtc_helper_funcs arc_pgu_crtc_helper_funcs = {
 	.disable	= arc_pgu_crtc_disable,
 	.prepare	= arc_pgu_crtc_disable,
 	.commit		= arc_pgu_crtc_enable,
-	.atomic_check	= arc_pgu_crtc_atomic_check,
 	.atomic_begin	= arc_pgu_crtc_atomic_begin,
+	.mode_fixup	= arc_pgu_crtc_mode_fixup,
 };
 
 static void arc_pgu_plane_atomic_update(struct drm_plane *plane,
