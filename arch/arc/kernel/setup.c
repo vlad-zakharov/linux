@@ -13,6 +13,7 @@
 #include <linux/clk-provider.h>
 #include <linux/clocksource.h>
 #include <linux/console.h>
+#include <linux/libfdt.h>
 #include <linux/module.h>
 #include <linux/cpu.h>
 #include <linux/of_fdt.h>
@@ -358,6 +359,26 @@ static void arc_chk_core_config(void)
 		panic("FPU non-existent, disable CONFIG_ARC_FPU_SAVE_RESTORE\n");
 }
 
+u32  __weak get_early_cpu_freq(void)
+{
+	u32 freq;
+	const struct fdt_property *prop;
+	int offset = fdt_path_offset(initial_boot_params, "/cpu_card/core_clk");
+
+	if (offset < 0) {
+		return 0;
+	}
+
+	prop = fdt_get_property(initial_boot_params, offset, "clock-frequency", NULL);
+	if (!prop) {
+		return 0;
+	}
+
+	freq = be32_to_cpu(*(u32*)(prop->data)) / 1000000;
+
+	return freq;
+}
+
 /*
  * Initialize and setup the processor core
  * This is called by all the CPUs thus should not do special case stuff
@@ -368,6 +389,11 @@ void setup_processor(void)
 {
 	char str[512];
 	int cpu_id = smp_processor_id();
+	u32 freq = get_early_cpu_freq();
+
+	if (freq) {
+		printk("CPU freq\t: %u MHz\n", freq);
+	}
 
 	read_arc_build_cfg_regs();
 	arc_init_IRQ();
