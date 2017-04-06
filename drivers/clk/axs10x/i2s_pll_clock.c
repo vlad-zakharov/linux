@@ -25,10 +25,6 @@
 
 struct i2s_pll_cfg {
 	unsigned int rate;
-	unsigned int idiv;
-	unsigned int fbdiv;
-	unsigned int odiv0;
-	unsigned int odiv1;
 };
 
 static const struct i2s_pll_cfg i2s_pll_cfg_27m[] = {
