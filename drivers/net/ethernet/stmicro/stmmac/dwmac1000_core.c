@@ -33,10 +33,19 @@
 #include "stmmac_pcs.h"
 #include "dwmac1000.h"
 
+void pr_info_gmac(void __iomem *ioaddr)
+{
+	pr_info("GMAC: control %#x addr is %p\n", readl(ioaddr + GMAC_CONTROL), ioaddr + GMAC_CONTROL);
+	pr_info("GMAC: debug %#x addr is %p\n", readl(ioaddr + GMAC_DEBUG), ioaddr + GMAC_DEBUG);
+}
+
 static void dwmac1000_core_init(struct mac_device_info *hw, int mtu)
 {
 	void __iomem *ioaddr = hw->pcsr;
 	u32 value = readl(ioaddr + GMAC_CONTROL);
+
+	pr_info("GMAC_BEFORE\n");
+	pr_info_gmac(ioaddr);
 
 	/* Configure GMAC core */
 	value |= GMAC_CORE_INIT;
@@ -77,6 +86,9 @@ static void dwmac1000_core_init(struct mac_device_info *hw, int mtu)
 	/* Tag detection without filtering */
 	writel(0x0, ioaddr + GMAC_VLAN_TAG);
 #endif
+	pr_info("GMAC_AFTER\n");
+	pr_info_gmac(ioaddr);
+
 }
 
 static int dwmac1000_rx_ipc_enable(struct mac_device_info *hw)

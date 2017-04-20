@@ -98,6 +98,7 @@ static void dwmac1000_dma_init(void __iomem *ioaddr,
 	 * Note: before stmmac core 3.50 this mode bit was 4xPBL, and
 	 * post 3.5 mode bit acts as 8*PBL.
 	 */
+
 	if (dma_cfg->pblx8)
 		value |= DMA_BUS_MODE_MAXPBL;
 	value |= DMA_BUS_MODE_USP;
@@ -120,6 +121,17 @@ static void dwmac1000_dma_init(void __iomem *ioaddr,
 		value |= DMA_BUS_MODE_AAL;
 
 	writel(value, ioaddr + DMA_BUS_MODE);
+
+	pr_info("DMA: busmode %#x\n", readl(ioaddr + DMA_BUS_MODE));
+	pr_info("DMA: txpolldemand %#x\n", readl(ioaddr + DMA_XMT_POLL_DEMAND));
+	pr_info("DMA: rxpolldemand %#x\n", readl(ioaddr + DMA_RCV_POLL_DEMAND));
+	pr_info("DMA: rxdesclistaddr %#x\n", readl(ioaddr + DMA_RCV_BASE_ADDR));
+	pr_info("DMA: txdesclistaddr %#x\n", readl(ioaddr + DMA_TX_BASE_ADDR));
+	pr_info("DMA: status %#x\n", readl(ioaddr + DMA_STATUS));
+	pr_info("DMA: opmode %#x\n", readl(ioaddr + DMA_CONTROL));
+	pr_info("DMA: intenable %#x\n", readl(ioaddr + DMA_INTR_ENA));
+	pr_info("DMA: axibus %#x\n", readl(ioaddr + DMA_AXI_BUS_MODE));
+
 
 	/* Mask interrupts by writing to CSR7 */
 	writel(DMA_INTR_DEFAULT_MASK, ioaddr + DMA_INTR_ENA);

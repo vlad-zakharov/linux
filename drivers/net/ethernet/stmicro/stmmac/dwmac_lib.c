@@ -26,10 +26,27 @@
 
 #define GMAC_HI_REG_AE		0x80000000
 
+static void pr_info_dma_regs(void __iomem *ioaddr)
+{   
+	pr_info("DMA: busmode %#x\n", readl(ioaddr + DMA_BUS_MODE));
+	pr_info("DMA: txpolldemand %#x\n", readl(ioaddr + DMA_XMT_POLL_DEMAND));
+	pr_info("DMA: rxpolldemand %#x\n", readl(ioaddr + DMA_RCV_POLL_DEMAND));
+	pr_info("DMA: rxdesclistaddr %#x\n", readl(ioaddr + DMA_RCV_BASE_ADDR));
+	pr_info("DMA: txdesclistaddr %#x\n", readl(ioaddr + DMA_TX_BASE_ADDR));
+	pr_info("DMA: status %#x\n", readl(ioaddr + DMA_STATUS));
+	pr_info("DMA: opmode %#x\n", readl(ioaddr + DMA_CONTROL));
+	pr_info("DMA: intenable %#x\n", readl(ioaddr + DMA_INTR_ENA));
+	pr_info("DMA: axibus %#x\n", readl(ioaddr + DMA_AXI_BUS_MODE));
+}
+
+
 int dwmac_dma_reset(void __iomem *ioaddr)
 {
 	u32 value = readl(ioaddr + DMA_BUS_MODE);
 	int limit;
+
+	pr_info("BEFORE\n");
+	pr_info_dma_regs(ioaddr);
 
 	/* DMA SW reset */
 	value |= DMA_BUS_MODE_SFT_RESET;
@@ -43,6 +60,11 @@ int dwmac_dma_reset(void __iomem *ioaddr)
 
 	if (limit < 0)
 		return -EBUSY;
+
+	dwmac_dma_flush_tx_fifo(ioaddr);
+
+	pr_info("AFTER\n");
+	pr_info_dma_regs(ioaddr);
 
 	return 0;
 }
