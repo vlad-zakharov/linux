@@ -2668,8 +2668,7 @@ static int stmmac_poll(struct napi_struct *napi, int budget)
 	stmmac_tx_clean(priv);
 
 	work_done = stmmac_rx(priv, budget);
-	if (work_done < budget) {
-		napi_complete(napi);
+	if ((work_done < budget) && napi_complete_done(napi, work_done)) {
 		stmmac_enable_dma_irq(priv);
 	}
 	return work_done;
